@@ -2,281 +2,175 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gyrus Industries Corp - Budget File 2026</title>
+    <title>Gyrus Group - Corporate Multi-Ledger</title>
     <style>
-        /* FULL RESET TO ELIMINATE GAPS */
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-        body { font-family: 'Inter', sans-serif; padding: 15px; background-color: #f1f5f9; color: #1e293b; }
-        
-        .header-main {
-            background: #0f172a; color: #fbbf24; padding: 15px; border-radius: 4px 4px 0 0;
-            text-align: center; border-bottom: 4px solid #fbbf24;
+        /* LOGIN & MANAGEMENT OVERLAY */
+        #password-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0f172a; display: flex; justify-content: center;
+            align-items: center; z-index: 9999; color: white; flex-direction: column;
         }
-        .header-main h1 { margin: 0; font-size: 22px; letter-spacing: 2px; text-transform: uppercase; }
-        
-        .toolbar { 
-            display: flex; gap: 10px; align-items: center; 
-            background: #fff; padding: 10px; border: 1px solid #cbd5e1; border-bottom: none;
+        .login-box { 
+            background: #1e293b; padding: 40px; border-radius: 12px; 
+            border: 2px solid #fbbf24; text-align: center; width: 400px;
         }
-
-        .table-container { overflow-x: auto; border: 1px solid #cbd5e1; background: white; }
-        
-        /* TABLE ARCHITECTURE - ZERO SPACING */
-        table { 
-            border-collapse: collapse; 
-            table-layout: fixed; 
-            min-width: 6500px; 
-            width: 100%;
-            border-spacing: 0; /* Ensures no internal gaps */
+        .login-box select, .login-box input { 
+            padding: 12px; margin: 8px 0; border-radius: 6px; border: 1px solid #475569; 
+            width: 100%; text-align: center; font-size: 14px; background: #0f172a; color: white;
         }
+        .btn-prime { background: #fbbf24; color: #0f172a; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .btn-sub { background: transparent; color: #94a3b8; border: 1px solid #475569; padding: 8px; border-radius: 6px; font-size: 11px; cursor: pointer; margin-top: 20px; width: 100%; }
         
-        .col-cat { width: 380px; } .col-val { width: 110px; } .col-pct { width: 75px; } 
-        .col-rem { width: 220px; } .col-ytd { width: 140px; } .col-final { width: 350px; }
+        /* HIDDEN ADMIN PANEL */
+        #admin-panel { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #475569; width: 100%; }
 
-        .sticky-col { position: sticky; left: 0; background: #1e293b !important; color: white; z-index: 30; border-right: 3px solid #fbbf24; }
-        
-        th { padding: 6px; font-size: 11px; text-transform: uppercase; border: 1px solid #475569; color: white; background: #334155; }
-        
-        .category-header { background-color: #334155 !important; color: #fbbf24 !important; font-weight: bold; }
-        td { border: 1px solid #e2e8f0; padding: 2px 6px; text-align: right; font-size: 13px; vertical-align: middle; height: 30px; }
-        
-        /* ITEM ROWS */
-        tr { margin: 0; padding: 0; vertical-align: middle; }
-        .sales-item-row, .cogs-item-row, .expenses-item-row { background-color: #f8fafc !important; }
-
-        /* SIMPLE RMCC */
-        .rmcc-simple { font-size: 10px; font-weight: 700; display: block; border-bottom: 1px solid #e2e8f0; margin-bottom: 2px; }
-        .rmcc-b { color: #2563eb; }
-        .rmcc-a { color: #ea580c; margin-left: 5px; }
-
-        .remarks-area, .name-area { 
-            font-size: 12px; text-align: left; background: transparent; 
-            width: 100%; border: none; resize: none; overflow: hidden;
-            height: auto; min-height: 1.2em; font-family: inherit; display: block;
-            line-height: 1.2;
-        }
-        .name-area { color: white; font-weight: 600; padding: 2px 0; }
-        .remarks-area { color: #64748b; }
-
-        .btn { border: none; padding: 6px 10px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 600; }
-        .btn-add { background:#10b981; color:white; float: right; padding: 1px 5px; }
-        .del-btn { background: transparent; color: #f87171; border: none; cursor: pointer; padding: 0 4px; opacity: 0; font-weight: bold; font-size: 14px; }
-        .sticky-col:hover .del-btn { opacity: 1; }
-        
-        input.val-inp { border: none; background: transparent; text-align: right; width: 100%; font-family: inherit; font-weight: 500; }
-        
-        /* SUMMARY GRID COLORING */
-        .total-row { background-color: #f1f5f9; font-weight: bold; }
-        .gor-row { background-color: #dcfce7 !important; color: #166534 !important; font-weight: bold; }
-        .pbt-row { background-color: #fef3c7 !important; color: #92400e !important; font-weight: bold; }
-        .pat-row { background-color: #0f172a !important; color: #fbbf24 !important; font-weight: bold; font-size: 14px; }
+        /* TABLE STYLES */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .header-main { background: #0f172a; color: #fbbf24; padding: 15px; text-align: center; border-bottom: 4px solid #fbbf24; }
+        .toolbar { display: flex; gap: 10px; background: #fff; padding: 10px; border-bottom: 1px solid #cbd5e1; }
+        .table-container { overflow-x: auto; background: white; height: calc(100vh - 120px); }
+        table { border-collapse: collapse; min-width: 5000px; }
+        .sticky-col { position: sticky; left: 0; background: #1e293b !important; color: white; z-index: 10; width: 350px; padding: 5px; }
+        td, th { border: 1px solid #e2e8f0; padding: 5px; text-align: right; font-size: 12px; }
+        .category-header { background: #334155; color: #fbbf24; font-weight: bold; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="header-main">
-        <h1>Gyrus Industries Corporation</h1>
-    </div>
-
-    <div class="toolbar">
-        <div style="font-size: 11px; font-weight: 800; background: #fbbf24; padding: 3px 6px; border-radius: 2px;">V10.0 MASTER</div>
-        <button class="btn" style="background: #3b82f6; color:white;" onclick="exportToFile()">💾 Save</button>
-        <button class="btn" style="background: #6366f1; color:white;" onclick="document.getElementById('fileInput').click()">📂 Load</button>
-        <input type="file" id="fileInput" style="display:none" onchange="importFromFile(this)">
-    </div>
-
-    <div class="table-container">
-        <table id="mainTable">
-            <thead>
-                <tr id="monthHeaders"></tr>
-                <tr id="subHeaders"></tr>
-            </thead>
+    <div id="password-overlay">
+        <div class="login-box">
+            <h1 style="color:#fbbf24; margin-bottom:10px;">CORPORATE PORTAL</h1>
             
-            <tr class="category-header"><td class="sticky-col col-cat">SALES REVENUE <button class="btn-add" onclick="addRow('sales')">+</button></td><td colspan="63"></td></tr>
-            <tbody id="sales-rows"></tbody>
-            <tr class="total-row" id="sales-total-row"></tr>
+            <div id="login-view">
+                <select id="companySelect"></select>
+                <input type="password" id="passInput" placeholder="Access Code">
+                <button class="btn-prime" onclick="checkAccess()">UNLOCK LEDGER</button>
+                <button class="btn-sub" onclick="toggleAdmin()">+ MANAGE COMPANIES</button>
+                <p id="err" style="color:#f87171; font-size:12px; margin-top:10px;"></p>
+            </div>
 
-            <tr class="category-header"><td class="sticky-col col-cat">COST OF GOODS SOLD <button class="btn-add" onclick="addRow('cogs')">+</button></td><td colspan="63"></td></tr>
-            <tbody id="cogs-rows"></tbody>
-            <tr class="total-row" id="cogs-total-row"></tr>
+            <div id="admin-panel">
+                <p style="font-size:12px; color:#fbbf24; margin-bottom:10px;">ADD NEW ENTITY</p>
+                <input type="text" id="newCoName" placeholder="New Company Name">
+                <input type="text" id="newCoPass" placeholder="Set Access Code">
+                <button class="btn-prime" style="background:#10b981; color:white;" onclick="addNewCompany()">SAVE NEW ENTITY</button>
+                <button class="btn-sub" onclick="toggleAdmin()">CANCEL</button>
+            </div>
+        </div>
+    </div>
 
-            <tr class="category-header"><td class="sticky-col col-cat">OPERATING EXPENSES <button class="btn-add" onclick="addRow('expenses')">+</button></td><td colspan="63"></td></tr>
-            <tbody id="expenses-rows"></tbody>
-            <tr class="total-row" id="expenses-total-row"></tr>
-
-            <tr class="gor-row" id="gor-summary-row"></tr> 
-            <tr class="pbt-row" id="pbt-summary-row"></tr> 
-            <tr class="pat-row" id="pat-summary-row"></tr> 
-        </table>
+    <div id="main-content" style="display:none;">
+        <div class="header-main"><h1 id="activeCoTitle">COMPANY NAME</h1></div>
+        <div class="toolbar">
+            <button onclick="location.reload()" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">🔒 LOGOUT</button>
+            <button onclick="addRow('sales')" style="background:#10b981; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">+ ADD REVENUE ROW</button>
+        </div>
+        <div class="table-container">
+            <table id="mainTable">
+                <thead><tr id="mHead"></tr></thead>
+                <tbody id="sales-rows">
+                    <tr class="category-header"><td class="sticky-col">REVENUE STREAMS</td><td colspan="100"></td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-        const formatter = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        // 1. INITIAL SETUP & PRE-LOADED DATA
+        let companies = JSON.parse(localStorage.getItem('corp_registry')) || [
+            { name: "GYRUS INDUSTRIES CORPORATION", pass: "GYRUS2026", id: "gyrus_data" },
+            { name: "IWS-TECHSERV CORPORATION", pass: "IWS2026", id: "iws_data" }
+        ];
 
-        function autoExpand(el) {
-            el.style.height = 'auto';
-            el.style.height = el.scrollHeight + 'px';
+        let activeDB = "";
+
+        function updateDropdown() {
+            const select = document.getElementById('companySelect');
+            select.innerHTML = companies.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
 
-        function exportToFile() {
-            const data = localStorage.getItem('gyrus_budget_2026');
-            if(!data) return;
-            const blob = new Blob([data], {type: "application/json"});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `Gyrus_Budget_2026.json`;
-            a.click();
+        // 2. COMPANY MANAGEMENT
+        function toggleAdmin() {
+            const panel = document.getElementById('admin-panel');
+            const login = document.getElementById('login-view');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            login.style.display = login.style.display === 'none' ? 'block' : 'none';
         }
 
-        function importFromFile(input) {
-            const reader = new FileReader();
-            reader.onload = () => { localStorage.setItem('gyrus_budget_2026', reader.result); location.reload(); };
-            reader.readAsText(input.files[0]);
-        }
+        function addNewCompany() {
+            const name = document.getElementById('newCoName').value;
+            const pass = document.getElementById('newCoPass').value;
+            if(!name || !pass) return alert("Please fill all fields");
 
-        function initTable() {
-            const mHead = document.getElementById('monthHeaders');
-            const sHead = document.getElementById('subHeaders');
-            const configs = [
-                { id: 'sales-total', label: 'SALES TOTAL' },
-                { id: 'cogs-total', label: 'COGS TOTAL' },
-                { id: 'expenses-total', label: 'EXPENSES TOTAL' },
-                { id: 'gor-summary', label: 'GROSS OPERATING REVENUE (GOR)' },
-                { id: 'pbt-summary', label: 'PROFIT BEFORE TAX (PBT)' },
-                { id: 'pat-summary', label: 'PROFIT AFTER TAX (PAT)' }
-            ];
-            
-            mHead.innerHTML = '<th rowspan="2" class="sticky-col col-cat">ACCOUNT CATEGORY</th>';
-            months.forEach((m, idx) => {
-                mHead.innerHTML += `<th colspan="${idx === 0 ? 6 : 5}">${m}</th>`;
-                if(idx === 0) sHead.innerHTML += `<th class="col-val">Dec(LM)</th>`;
-                sHead.innerHTML += `<th class="col-val">Forecast</th><th class="col-val">Act</th><th class="col-pct">vsB%</th><th class="col-pct">vsL%</th><th class="col-rem">Remarks</th>`;
-            });
-            mHead.innerHTML += `<th rowspan="2" class="col-ytd">YTD ACT</th><th rowspan="2" class="col-final">ANNUAL SUMMARY</th>`;
-
-            configs.forEach(conf => {
-                const row = document.getElementById(`${conf.id}-row`);
-                if(!row) return;
-                let html = `<td class="sticky-col col-cat">${conf.label}</td>`;
-                months.forEach((_, idx) => {
-                    if(idx === 0) html += `<td id="tot-0-lm-${conf.id}">0.00</td>`;
-                    html += `<td id="tot-${idx}-f-${conf.id}">0.00</td><td id="tot-${idx}-a-${conf.id}">0.00</td><td id="pct-${idx}-f-${conf.id}">0.0%</td><td id="pct-${idx}-lm-${conf.id}">0.0%</td>`;
-                    html += `<td><textarea class="remarks-area data-save" data-key="${conf.id}-rem-${idx}" oninput="autoExpand(this); saveData();"></textarea></td>`;
-                });
-                html += `<td id="ytd-a-${conf.id}">0.00</td><td><textarea class="remarks-area data-save" data-key="${conf.id}-rem-final" oninput="autoExpand(this); saveData();"></textarea></td>`;
-                row.innerHTML = html;
-            });
-            loadData();
-        }
-
-        function addRow(section, loadedData = null) {
-            const tbody = document.getElementById(`${section}-rows`);
-            const row = document.createElement('tr');
-            row.className = `${section}-item-row`;
-            row.dataset.rowId = loadedData ? loadedData.id : Date.now();
-
-            let html = `<td class="sticky-col col-cat" style="display:flex; align-items:center;">
-                <button class="del-btn" onclick="this.closest('tr').remove(); compute(); saveData();">×</button>
-                <textarea class="name-area data-save" oninput="autoExpand(this); saveData();" placeholder="Item Name...">${loadedData ? loadedData.name : ''}</textarea>
-            </td>`;
-            
-            months.forEach((_, idx) => {
-                let v = loadedData ? loadedData.vals[idx] : {lm:'0.00', f:'0.00', a:'0.00', rem:''};
-                if(idx === 0) html += `<td><input type="text" class="val-lm val-inp live-inp" value="${v.lm}"></td>`;
-                html += `<td><input type="text" class="val-f val-inp live-inp" value="${v.f}"></td><td><input type="text" class="val-a val-inp live-inp" value="${v.a}"></td><td class="row-pct-f">0.0%</td><td class="row-pct-lm">0.0%</td>`;
-                html += `<td><div class="rmcc-wrapper"></div><textarea class="remarks-area data-save" oninput="autoExpand(this); saveData();">${v.rem}</textarea></td>`;
-            });
-            html += `<td class="row-ytd-a">0.00</td><td><textarea class="remarks-area data-save" oninput="autoExpand(this); saveData();">${loadedData?loadedData.finalRem:''}</textarea></td>`;
-            
-            row.innerHTML = html;
-            tbody.appendChild(row);
-            row.querySelectorAll('.live-inp').forEach(i => i.addEventListener('input', () => { compute(); saveData(); }));
-            compute();
-        }
-
-        function saveData() {
-            const data = { sales: [], cogs: [], expenses: [], meta: {} };
-            ['sales', 'cogs', 'expenses'].forEach(sec => {
-                document.querySelectorAll(`.${sec}-item-row`).forEach(row => {
-                    const rowObj = { id: row.dataset.rowId, name: row.querySelector('.name-area').value, vals: [], finalRem: row.querySelector('td:last-child textarea').value };
-                    const lms = row.querySelectorAll('.val-lm'), fs = row.querySelectorAll('.val-f'), as = row.querySelectorAll('.val-a'), rems = row.querySelectorAll('.col-rem textarea, td textarea');
-                    months.forEach((_, i) => rowObj.vals.push({ lm: lms[0]?.value || '0.00', f: fs[i].value, a: as[i].value, rem: rems[i].value }));
-                    data[sec].push(rowObj);
-                });
-            });
-            document.querySelectorAll('.data-save[data-key]').forEach(el => data.meta[el.dataset.key] = el.value);
-            localStorage.setItem('gyrus_budget_2026', JSON.stringify(data));
-        }
-
-        function loadData() {
-            const saved = localStorage.getItem('gyrus_budget_2026');
-            if (!saved) return;
-            const data = JSON.parse(saved);
-            ['sales', 'cogs', 'expenses'].forEach(sec => data[sec].forEach(row => addRow(sec, row)));
-            document.querySelectorAll('.data-save[data-key]').forEach(el => { el.value = data.meta[el.dataset.key] || ''; autoExpand(el); });
-            compute();
-        }
-
-        function compute() {
-            let store = { 
-                sales: { f: Array(12).fill(0), a: Array(12).fill(0), lm: 0, ytd: 0 }, 
-                cogs: { f: Array(12).fill(0), a: Array(12).fill(0), lm: 0, ytd: 0 }, 
-                expenses: { f: Array(12).fill(0), a: Array(12).fill(0), lm: 0, ytd: 0 } 
+            const newCo = {
+                name: name.toUpperCase(),
+                pass: pass,
+                id: "db_" + name.toLowerCase().replace(/\s+/g, '_') + "_" + Date.now()
             };
-            
-            ['sales', 'cogs', 'expenses'].forEach(sec => {
-                document.querySelectorAll(`.${sec}-item-row`).forEach(row => {
-                    let rYTD = 0, vLM = parseFloat(row.querySelector('.val-lm')?.value.replace(/,/g,'')) || 0;
-                    if(row.querySelector('.val-lm')) store[sec].lm += vLM;
-                    const fInps = row.querySelectorAll('.val-f'), aInps = row.querySelectorAll('.val-a'), pF = row.querySelectorAll('.row-pct-f'), pL = row.querySelectorAll('.row-pct-lm');
-                    aInps.forEach((ainp, i) => {
-                        let a = parseFloat(ainp.value.replace(/,/g,'')) || 0, f = parseFloat(fInps[i].value.replace(/,/g,'')) || 0, prev = (i === 0) ? vLM : (parseFloat(aInps[i-1].value.replace(/,/g,'')) || 0);
-                        store[sec].a[i] += a; store[sec].f[i] += f; rYTD += a;
-                        pF[i].innerText = ((!f?0:(a-f)/Math.abs(f))*100).toFixed(1)+'%';
-                        pL[i].innerText = ((!prev?0:(a-prev)/Math.abs(prev))*100).toFixed(1)+'%';
-                    });
-                    row.querySelector('.row-ytd-a').innerText = formatter.format(rYTD);
-                    store[sec].ytd += rYTD;
-                });
-                if(document.getElementById(`tot-0-lm-${sec}-total`)) document.getElementById(`tot-0-lm-${sec}-total`).innerText = formatter.format(store[sec].lm);
-                document.getElementById(`ytd-a-${sec}-total`).innerText = formatter.format(store[sec].ytd);
-                months.forEach((_, i) => {
-                    document.getElementById(`tot-${i}-f-${sec}-total`).innerText = formatter.format(store[sec].f[i]);
-                    document.getElementById(`tot-${i}-a-${sec}-total`).innerText = formatter.format(store[sec].a[i]);
-                });
-            });
 
-            let ytdGOR = 0;
-            months.forEach((_, i) => {
-                ['f', 'a'].forEach(m => {
-                    let gor = store.sales[m][i] - store.cogs[m][i] - store.expenses[m][i];
-                    document.getElementById(`tot-${i}-${m}-gor-summary`).innerText = formatter.format(gor);
-                    document.getElementById(`tot-${i}-${m}-pbt-summary`).innerText = formatter.format(gor);
-                    document.getElementById(`tot-${i}-${m}-pat-summary`).innerText = formatter.format(gor * 0.8);
-                    if(m === 'a') ytdGOR += gor;
-                });
-            });
-            document.getElementById(`ytd-a-gor-summary`).innerText = formatter.format(ytdGOR);
-            document.getElementById(`ytd-a-pbt-summary`).innerText = formatter.format(ytdGOR);
-            document.getElementById(`ytd-a-pat-summary`).innerText = formatter.format(ytdGOR * 0.8);
+            companies.push(newCo);
+            localStorage.setItem('corp_registry', JSON.stringify(companies));
+            updateDropdown();
+            toggleAdmin();
+            alert("New company added successfully!");
+        }
 
-            const sR = document.querySelector('.sales-item-row');
-            if(sR) {
-                const sF = Array.from(sR.querySelectorAll('.val-f')).map(x => parseFloat(x.value.replace(/,/g,''))||0);
-                const sA = Array.from(sR.querySelectorAll('.val-a')).map(x => parseFloat(x.value.replace(/,/g,''))||0);
-                document.querySelectorAll('.cogs-item-row').forEach(row => {
-                    const cF = Array.from(row.querySelectorAll('.val-f')).map(x => parseFloat(x.value.replace(/,/g,''))||0);
-                    const cA = Array.from(row.querySelectorAll('.val-a')).map(x => parseFloat(x.value.replace(/,/g,''))||0);
-                    const wrappers = row.querySelectorAll('.rmcc-wrapper');
-                    cA.forEach((c, i) => {
-                        let rf = sF[i] > 0 ? (cF[i]/sF[i])*100 : 0, ra = sA[i] > 0 ? (cA[i]/sA[i])*100 : 0;
-                        wrappers[i].innerHTML = `<span class="rmcc-simple"><span class="rmcc-b">B:${rf.toFixed(1)}%</span> <span class="rmcc-a">A:${ra.toFixed(1)}%</span></span>`;
-                    });
-                });
+        // 3. ACCESS CONTROL
+        function checkAccess() {
+            const id = document.getElementById('companySelect').value;
+            const pass = document.getElementById('passInput').value;
+            const targetCo = companies.find(c => c.id === id);
+
+            if (targetCo && targetCo.pass === pass) {
+                activeDB = targetCo.id;
+                document.getElementById('password-overlay').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('activeCoTitle').innerText = targetCo.name;
+                buildTable();
+            } else {
+                document.getElementById('err').innerText = "INVALID ACCESS CODE";
             }
         }
-        window.onload = initTable;
+
+        // 4. TABLE LOGIC
+        function buildTable() {
+            const head = document.getElementById('mHead');
+            head.innerHTML = '<th class="sticky-col">ACCOUNT</th>';
+            for(let i=1; i<=12; i++) head.innerHTML += `<th colspan="3">MONTH ${i}</th>`;
+            
+            // Load existing data for this specific company
+            const saved = JSON.parse(localStorage.getItem(activeDB)) || [];
+            saved.forEach(row => renderRow('sales', row));
+        }
+
+        function addRow(section) {
+            renderRow(section, { name: "", vals: [] });
+            saveAll();
+        }
+
+        function renderRow(section, data) {
+            const tbody = document.getElementById(section + '-rows');
+            const tr = document.createElement('tr');
+            let html = `<td class="sticky-col"><input type="text" value="${data.name}" oninput="saveAll()" style="width:100%; background:transparent; color:white; border:none;"></td>`;
+            for(let i=0; i<36; i++) {
+                html += `<td><input type="text" oninput="saveAll()" style="width:50px; border:none; text-align:right;"></td>`;
+            }
+            tr.innerHTML = html;
+            tbody.appendChild(tr);
+        }
+
+        function saveAll() {
+            const rows = [];
+            document.querySelectorAll('#sales-rows tr:not(.category-header)').forEach(tr => {
+                const name = tr.querySelector('input').value;
+                rows.push({ name: name });
+            });
+            localStorage.setItem(activeDB, JSON.stringify(rows));
+        }
+
+        // Initial Load
+        updateDropdown();
     </script>
 </body>
 </html>
